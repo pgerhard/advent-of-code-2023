@@ -59,13 +59,43 @@ def _error(msg):
         f"{msg}"
     )
 
+def _create_go_project(day):
+    main_go = """
+package main
+
+import "fmt"
+    
+func main() {
+	fmt.Println("Hello World")
+}
+"""
+    global LIVE
+
+    day_project_path = f"{SCRIPT_PATH}/golang/{day}"
+    _debug(f"Creating Go project at: '{day_project_path}'")
+    if LIVE:
+        os.makedirs(day_project_path, exist_ok=True)
+        print(subprocess.check_output(
+                    ['go', 'mod', 'init', day],
+                    cwd=f"{day_project_path}"
+                )
+            )
+        with open(f"{day_project_path}/main.go", "w") as f:
+            f.write(main_go)
+        print(subprocess.check_output(
+                    ['goland', '.'],
+                    cwd=f"{day_project_path}"
+                )
+            )
+
+
 def _create_rust_project(day):
     global LIVE
 
-    day_project_path = f"{SCRIPT_PATH}/rust"
-    _debug(f"Creating Rust project at: '{day_project_path}/{day}'")
+    rust_projects_path = f"{SCRIPT_PATH}/rust"
+    _debug(f"Creating Rust project at: '{rust_projects_path}/{day}'")
     if LIVE:
-        os.makedirs(day_project_path, exist_ok=True)
+        os.makedirs(rust_projects_path, exist_ok=True)
         print(subprocess.check_output(
                     ['cargo', 'new', day],
                     cwd=f"{SCRIPT_PATH}/rust"
@@ -73,7 +103,7 @@ def _create_rust_project(day):
             )
         print(subprocess.check_output(
                     ['rustrover'],
-                    cwd=f"{SCRIPT_PATH}/rust/{day}"
+                    cwd=f"{rust_projects_path}/{day}"
                 )
             )
 
@@ -85,7 +115,7 @@ def main():
     parser = argparse.ArgumentParser(description='Script to download model files')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')
     parser.add_argument('-l', '--live', action='store_true', help='Enable live mode')
-    parser.add_argument('language', nargs=1, help='Languge of the project', choices=['rust'])
+    parser.add_argument('language', nargs=1, help='Languge of the project', choices=['go', 'rust'])
     parser.add_argument('day', nargs=1, help='Advent of code day')
 
     args = parser.parse_args()
@@ -104,7 +134,9 @@ def main():
     _info(f"Selected language: '{language}'")
     _info(f"Selected day: '{day}'")
     
-    if language == "rust":
+    if language == "go":
+        _create_go_project(day)
+    elif language == "rust":
         _create_rust_project(day)
     else:
         _error(f"No valid language selected. Got {language}")
