@@ -60,8 +60,7 @@ def _error(msg):
     )
 
 def _create_go_project(day):
-    main_go = """
-package main
+    main_go = """package main
 
 import "fmt"
     
