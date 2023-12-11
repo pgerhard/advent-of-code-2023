@@ -101,7 +101,7 @@ def _create_rust_project(day):
                 )
             )
         print(subprocess.check_output(
-                    ['rustrover'],
+                    ['rustrover', '.'],
                     cwd=f"{rust_projects_path}/{day}"
                 )
             )
